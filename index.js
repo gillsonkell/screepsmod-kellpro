@@ -4,8 +4,13 @@ module.exports = function (config) {
     const fs = require('fs');
     const pg = require('pg');
 
-    const options = JSON.parse(await fs.promises.readFile('config.json', 'utf8')) || {};
-    options.tiers = options.tiers || [];
+    let options;
+    try {
+      options = JSON.parse(await fs.promises.readFile('config.json', 'utf8'));
+    } catch (err) {
+      console.log(err);
+      return;
+    }
 
     if (config.backend) {
       config.backend.welcomeText = `
