@@ -224,7 +224,8 @@ module.exports = function (config) {
 
       config.cronjobs.recordStats = [15, async function () {
         getDatabaseClient(async function (client) {
-          const db = config.common.storage.db;
+          const storage = config.common.storage;
+          const db = storage.db;
           const users = await db.users.find();
           const gameTime = await storage.env.get(storage.env.keys.GAMETIME);
           for (const user of users) {
