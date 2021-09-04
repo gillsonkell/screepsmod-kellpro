@@ -1,6 +1,5 @@
 module.exports = function (config) {
   (async () => {
-    const express = require('express');
     const fs = require('fs');
     const pg = require('pg');
 
