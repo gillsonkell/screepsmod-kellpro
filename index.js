@@ -226,9 +226,10 @@ module.exports = function (config) {
         getDatabaseClient(async function (client) {
           const db = config.common.storage.db;
           const users = await db.users.find();
+          const gameTime = await storage.env.get(storage.env.keys.GAMETIME);
           for (const user of users) {
             if (user.steam) {
-              await client.query(`INSERT INTO player_scores (player_id, gcl) VALUES ($1, $2)`, [user._id, user.gcl]);
+              await client.query(`INSERT INTO player_scores (player_id, gcl, tick) VALUES ($1, $2, $3)`, [user._id, user.gcl, gameTime]);
             }
           }
           
