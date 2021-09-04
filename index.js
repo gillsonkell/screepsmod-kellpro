@@ -21,7 +21,9 @@ module.exports = function (config) {
       config.backend.on('expressPreConfig', async function (app) {
         app.get('/leaderboard', async function (req, res) {
           getDatabaseClient(async function (client) {
-            const db = config.common.storage.db;
+            const storage = config.common.storage;
+            const db = storage.db;
+            const gameTime = await storage.env.get(storage.env.keys.GAMETIME);
             const users = (await db.users.find())
               .filter(user => user.steam && user.username);
             const dataSize = 100;
@@ -32,7 +34,7 @@ module.exports = function (config) {
               players AS (
                 SELECT DISTINCT player_id FROM player_scores
               )
-              SELECT players.player_id, series.date, player_scores.gcl
+              SELECT players.player_id, series.date, player_scores.gcl, player_scores.tick
               FROM series
               CROSS JOIN players
               LEFT JOIN player_scores ON player_scores.id = (SELECT id FROM player_scores WHERE created_date > series.date AND player_id = players.player_id ORDER BY created_date LIMIT 1)
@@ -45,6 +47,7 @@ module.exports = function (config) {
                 userScore.player_id = user._id;
                 userScore.date = new Date().toLocaleString();
                 userScore.gcl = user.gcl;
+                userScore.tick = gameTime;
               }
 
               usersById[user._id] = user;
@@ -144,7 +147,7 @@ module.exports = function (config) {
                     continue;
                   }
                   seriesObject[record.player_id].push(record.gcl);
-                  datesObject[record.date] = true;
+                  datesObject[record.date + ', ' + record.tick.toLocaleString()] = true;
                 }
                 const dates = Object.keys(datesObject);
                 const series = [];
