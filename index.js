@@ -4,7 +4,8 @@ module.exports = function (config) {
     const fs = require('fs');
     const pg = require('pg');
 
-    const options = JSON.parse(await fs.promises.readFile('config.json', 'utf8'));
+    const options = JSON.parse(await fs.promises.readFile('config.json', 'utf8')) || {};
+    options.tiers = options.tiers || [];
 
     if (config.backend) {
       config.backend.welcomeText = `
@@ -168,6 +169,42 @@ module.exports = function (config) {
           });
         });
       });
+
+      if (options.notify && options.notify.name && options.notify.password) {
+        const ignoreError = await fs.promises.readFile(`${__dirname}/ignore-error.txt`, 'utf8');
+
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport(`smtps://${options.notify.name}%40gmail.com:${options.notify.password}@smtp.gmail.com`);
+
+        config.backend.on('sendUserNotifications', (user, notifications) => {
+          if (!user.email) {
+            return;
+          }
+
+          notifications = notifications.filter(notification => notification.message !== ignoreError);
+          if (!notifications.length) {
+            return;
+          }
+
+          const mailOptions = {
+            from: `${options.notify.from_name} <${options.notify.name}@gmail.com>`,
+            to: user.email,
+            subject: `${options.notify.from_name} Notifications`
+          };
+
+          mailOptions.text = `${notifications.length} notifications received:\n\n`;
+
+          for (const notification of notifications) {
+            mailOptions.text += `${notification.message}\n[${notification.type}] (${notification.count})\n\n`;
+          }
+
+          transporter.sendMail(mailOptions, (error) => {
+            if (error) {
+              console.error(error);
+            }
+          });
+        });
+      }
     }
 
     if (config.cronjobs) {

@@ -1,0 +1,45 @@
+{
+  "pgPassword": "",
+  "notify": {
+    "from_name": "KellPro Screeps",
+    "name": "",
+    "password": ""
+  },
+  "tiers": [
+    {
+      "name": "Bronze",
+      "cap": 3000000,
+      "rewards": [
+        50,
+        30,
+        20
+      ]
+    },
+    {
+      "name": "Silver",
+      "cap": 15000000,
+      "rewards": [
+        150,
+        100,
+        75
+      ]
+    },
+    {
+      "name": "Gold",
+      "cap": 50000000,
+      "rewards": [
+        250,
+        200,
+        175
+      ]
+    },
+    {
+      "name": "Platinum",
+      "rewards": [
+        500,
+        400,
+        300
+      ]
+    }
+  ]
+}

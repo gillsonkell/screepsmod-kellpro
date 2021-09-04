@@ -1,0 +1,5 @@
+SyntaxError: Unexpected token u in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at global._init.global._start (<runtime>:15997:45)
+    at (<isolated-vm boundary>)
+    at make (/home/ubuntu/screeps/node_modules/@screeps/driver/lib/runtime/make.js:142:34)
